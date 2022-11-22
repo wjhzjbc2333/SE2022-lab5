@@ -33,11 +33,14 @@ class MainWidget(QWidget):
         self.button3.clicked.connect(self.inequalAction)
         self.button4 = QPushButton('存疑')
         self.button4.clicked.connect(self.doubtAction)
+        self.button5 = QPushButton('比较')
+        self.button5.clicked.connect(self.diffAction)
         layout2 = QVBoxLayout()
         layout2.addWidget(self.button1)
         layout2.addWidget(self.button2)
         layout2.addWidget(self.button3)
         layout2.addWidget(self.button4)
+        layout2.addWidget(self.button5)
         layout.addLayout(layout2)
         layout.addWidget(self.text2)
         self.setLayout(layout)
@@ -51,6 +54,9 @@ class MainWidget(QWidget):
         
         self.tempFile1 = ''
         self.tempFile2 = ''
+        
+        self.allTexts1 = []
+        self.allTexts2 = []
     
     
     def clear(self):
@@ -91,13 +97,19 @@ class MainWidget(QWidget):
         data1 = ''
         data2 = ''
         with open(filePath1, encoding='utf-8', mode='r') as f1:
-            data1 = f1.read()
+            self.allTexts1 = f1.read().splitlines()
+            #data1 = f1.read()
         with open(filePath2, encoding='utf-8', mode='r') as f2:
-            data2 = f2.read()
-        self.text1.append(data1)
-        self.text2.append(data2)
+            self.allTexts2 = f2.read().splitlines()
+            #data2 = f2.read()
+        for item in self.allTexts1:
+            self.text1.append(item)
+        for item in self.allTexts2:
+            self.text2.append(item)
     
     def equalAction(self):
+        color = QColor("#000000")
+        self.text2.setTextColor(color)
         if self.pos >= self.maxPos:
             self.printResult()
         else:
@@ -136,6 +148,8 @@ class MainWidget(QWidget):
             self.showCode()
     
     def inequalAction(self):
+        color = QColor("#000000")
+        self.text2.setTextColor(color)
         if self.pos >= self.maxPos:
             self.printResult()
         else:
@@ -167,6 +181,23 @@ class MainWidget(QWidget):
             self.tempFile1 = file1
             self.tempFile2 = file2
             self.showCode()
+    
+    def diffAction(self):
+        self.text2.setText(self.tempFile2 + '\n')
+        for item in self.allTexts2:
+            flag = 0
+            for temp in self.allTexts1:
+                if temp.strip() == item.strip():
+                    flag = 1
+                    break
+            if flag == 0:
+                color = QColor("#ff00ff")
+                self.text2.setTextColor(color)
+                self.text2.append(item)
+            else:
+                color = QColor("#000000")
+                self.text2.setTextColor(color)
+                self.text2.append(item)
     
     def printResult(self):
         self.text1.setText('已确认完毕！')
